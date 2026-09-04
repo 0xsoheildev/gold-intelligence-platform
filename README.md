@@ -1,57 +1,155 @@
-# Gold Intelligence Platform — Phase 0/1
+<div align="center">
 
-این نسخه فقط **Data Ingestion + Raw Storage + API پایه** رو پیاده‌سازی می‌کنه
-(طبق فازبندی سند پروژه). هنوز Signal Engine، News، Premium و بقیه نیست —
-اول باید مطمئن بشیم این پایه محکمه.
+# 🥇 Gold Intelligence Platform
 
-## پیش‌نیاز
-- Docker + Docker Compose
-- (اختیاری برای اجرای مستقیم بدون Docker) Python 3.11+
+**Iranian gold market intelligence — data ingestion, technical analysis, and LLM-explained trading signals**
 
-## راه‌اندازی سریع
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-TimescaleDB-336791?logo=postgresql&logoColor=white)](https://www.timescale.com/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/status-in%20development-orange)]()
 
-```bash
-cp .env.example .env
-# GOLDAPI_KEY رو با کلید رایگانت از goldapi.io پر کن
+</div>
 
-docker compose up -d db      # فقط دیتابیس رو بالا بیار
-docker compose up backend    # API روی http://localhost:8000
+---
+
+## What is this?
+
+A system that collects gold and coin prices from Iranian and global markets, cross-references them against USD/IRR exchange rates, tracks the local market "premium" (bubble), ingests financial news, and produces a **buy / hold / sell signal — with a confidence score and a plain-language explanation, not just a label.**
+
+Unlike a naive "feed prices and news into an LLM" approach, the decision-making here is **deterministic**: technical indicators, premium valuation, and news impact are scored numerically first. The LLM's job is to *explain* the result — not to calculate it.
+
+```
+Signal (7D):  BUY      Confidence: HIGH  (Score: 78)
+Signal (30D): BUY      Confidence: MEDIUM (Score: 65)
+Signal (90D): HOLD     Confidence: LOW    (Score: 52)
+
+Reasons:
++ Gold momentum is positive (Technical Score: 79)
++ USD/IRR trend is upward
++ Current premium is below its 90-day average (Z-score: -0.8)
++ Recent news sentiment is moderately bullish
+
+Risk: Medium — elevated short-term volatility
+Invalidation: USD/IRR drops below X, or gold breaks below Y
 ```
 
-مستندات API خودکار: http://localhost:8000/docs
+---
 
-## اجرای ingestion (fetcher ها)
+## ✨ Key ideas
 
-فعلاً جدا از backend service اجرا می‌شه (در فازهای بعد به Celery/Kafka منتقل می‌شه):
+- 📥 **Multi-source ingestion** — Iranian gold/coin markets + global XAU/USD, never overwriting raw data
+- 🧮 **Deterministic signal engine** — technical indicators, premium/bubble valuation with historical Z-scores, and news impact scoring, combined with transparent weights
+- 🗞️ **Structured news intelligence** — deduplication and event classification instead of naive sentiment
+- 🧠 **LLM as analyst, not oracle** — the model explains a decision that was already made numerically
+- 🔁 **Backtested, not guessed** — signal thresholds are calibrated against historical data
+- 📱 **Multi-surface** — REST API → Telegram bot → web dashboard → native Android app (Kotlin/Compose)
+
+---
+
+## 🏗️ Architecture
+
+```
+                    DATA SOURCES
+        ┌────────────────┼────────────────┐
+   Iranian markets   Global markets      News
+   (scraping)         (XAU/USD API)   (RSS/News API)
+        └────────────────┼────────────────┘
+                         ↓
+                 INGESTION LAYER
+                         ↓
+              RAW STORAGE (append-only)
+                         ↓
+              DATA QUALITY LAYER
+        (outlier detection · source reliability)
+                         ↓
+              FEATURE ENGINEERING
+        ┌────────────────┼────────────────┐
+   Technical           Premium /          News /
+   (RSI, MACD, …)      Bubble (Z-score)   Event Intelligence
+        └────────────────┼────────────────┘
+                         ↓
+                  SIGNAL ENGINE
+                         ↓
+                  BACKTEST ENGINE
+                         ↓
+                LLM EXPLANATION LAYER
+                         ↓
+                   FastAPI  →  Telegram bot · Web dashboard · Android app
+```
+
+---
+
+## 🧰 Tech stack
+
+| Layer | Choice |
+|---|---|
+| Backend | Python, FastAPI |
+| Database | PostgreSQL + TimescaleDB |
+| Data processing | Pandas / Polars |
+| Scheduling | APScheduler → Celery/Kafka (later phases) |
+| Scraping | httpx, BeautifulSoup, Playwright |
+| ML (later phase) | scikit-learn, XGBoost |
+| LLM | Claude API — explanation only, never decision-making |
+| Web dashboard | Next.js |
+| Mobile app | Kotlin, Jetpack Compose |
+| Infra | Docker Compose |
+
+---
+
+## 🚀 Getting started
 
 ```bash
-cd ingestion
-pip install -r ../backend/requirements.txt
+git clone https://github.com/0xsoheildev/gold-intelligence.git
+cd gold-intelligence
+cp .env.example .env
+# add your GOLDAPI_KEY (free tier at goldapi.io) to .env
+
+docker compose up -d db       # start the database
+docker compose up backend     # start the API on http://localhost:8000
+```
+
+API docs: `http://localhost:8000/docs`
+
+Run the ingestion scheduler (fetches Iranian + global prices every 10 minutes):
+
+```bash
+python3 -m venv venv && source venv/bin/activate
+pip install -r backend/requirements.txt
 export DATABASE_URL=postgresql+psycopg2://gold_user:gold_pass@localhost:5432/gold_intelligence
-export GOLDAPI_KEY=your_key
+export GOLDAPI_KEY=your_key_here
 python -m ingestion.scheduler
 ```
 
-این هر ۱۰ دقیقه (قابل تنظیم با `FETCH_INTERVAL_MINUTES`) دو منبع رو fetch می‌کنه:
-- **tgju** (ایران): طلای ۱۸، سکه امامی، نیم/ربع سکه، نرخ دلار
-- **goldapi** (جهانی): XAU/USD
+---
 
-## چک کردن نتیجه
+## 🗺️ Roadmap
 
-```bash
-curl http://localhost:8000/prices/live
-curl "http://localhost:8000/prices/history?symbol=gold_18k&limit=50"
-```
+- [x] **Phase 0** — Product design
+- [x] **Phase 1** — Data ingestion + raw storage
+- [ ] **Phase 2** — Premium / bubble engine
+- [ ] **Phase 3** — Technical indicators engine
+- [ ] **Phase 4** — Signal engine (v1)
+- [ ] **Phase 5** — News / event intelligence
+- [ ] **Phase 6** — Data quality layer (outlier detection, source reliability)
+- [ ] **Phase 7** — Premium Z-score + multi-horizon signals
+- [ ] **Phase 8** — Backtesting engine
+- [ ] **Phase 9** — LLM explanation layer
+- [ ] **Phase 9.5** — Kafka event streaming (optional)
+- [ ] **Phase 10** — Web dashboard
+- [ ] **Phase 11** — Android app
+- [ ] **Phase 12** — Hardening & production
 
-## نکات مهم قبل از استفاده‌ی واقعی
+---
 
-1. **selectors سایت tgju رو verify کن** — ساختار HTML سایت‌های ایرانی مدام
-   تغییر می‌کنه؛ `ingestion/sources/tgju_source.py` رو با inspect کردن صفحه‌ی
-   واقعی به‌روزرسانی کن.
-2. کلید GoldAPI رایگان محدودیت درخواست داره — برای تست کافیه، برای production
-   باید پلن مناسب بگیری یا منبع جایگزین (metals-api.com) اضافه کنی.
-3. این فاز **بدون Data Quality Layer** هست — یعنی اگه یه منبع قیمت غلط بده،
-   فعلاً فیلتر نمی‌شه. این در فاز ۶ اضافه می‌شه (طبق سند پروژه).
+## ⚠️ Disclaimer
 
-## قدم بعدی
-طبق نقشه‌ی راه: Phase 2 (Premium Engine) و Phase 3 (Technical Engine).
+This project is for educational and research purposes. Signals produced by this system are **not financial advice**. Always do your own research before making investment decisions.
+
+---
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE) for details.
