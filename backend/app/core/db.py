@@ -9,7 +9,6 @@ Base = declarative_base()
 
 
 def get_db():
-    """Dependency برای FastAPI — یه session می‌ده و بعد می‌بنده."""
     db = SessionLocal()
     try:
         yield db

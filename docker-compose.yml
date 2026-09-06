@@ -29,7 +29,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+psycopg2://gold_user:gold_pass@db:5432/gold_intelligence
+      DATABASE_URL: postgresql+psycopg://gold_user:gold_pass@db:5432/gold_intelligence
     ports:
       - "8000:8000"
     volumes:

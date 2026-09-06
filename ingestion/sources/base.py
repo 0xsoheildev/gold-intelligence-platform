@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 
 @dataclass
 class PricePoint:
-    """یک قیمت خام از یک منبع، آماده برای insert در raw_prices."""
     source: str
     symbol: str
     price: float
@@ -19,12 +18,6 @@ class PricePoint:
 
 
 class BaseSource(ABC):
-    """
-    قرارداد مشترک همه‌ی منابع.
-    هر منبع جدید (چه ایرانی چه جهانی) فقط باید fetch() رو پیاده‌سازی کنه
-    و لیستی از PricePoint برگردونه — بقیه‌ی pipeline (ذخیره‌سازی، validation) مشترکه.
-    """
-
     name: str
 
     @abstractmethod

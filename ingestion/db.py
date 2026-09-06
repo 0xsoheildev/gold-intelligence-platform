@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, text
 
 DATABASE_URL = os.environ.get(
     "DATABASE_URL",
-    "postgresql+psycopg2://gold_user:gold_pass@localhost:5432/gold_intelligence",
+    "postgresql+psycopg://gold_user:gold_pass@localhost:5432/gold_intelligence",
 )
 
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
@@ -19,7 +19,6 @@ INSERT_SQL = text(
 
 
 def save_price_points(points) -> int:
-    """ذخیره‌ی یک لیست PricePoint در raw_prices. هیچ‌وقت update/overwrite نمی‌کنه، فقط insert."""
     if not points:
         return 0
 

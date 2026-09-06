@@ -1,8 +1,5 @@
 """
-منبع جهانی: GoldAPI.io (goldapi.io)
-
-نیاز به API key رایگان داره (goldapi.io ثبت‌نام کن، پلن رایگان محدودیت
-درخواست داره ولی برای MVP کافیه). کلید رو در .env بذار، هیچ‌وقت hardcode نکن.
+Global Source: GoldAPI.io — Requires a free API key (sign up at GoldAPI.io).
 """
 
 import httpx
@@ -27,7 +24,6 @@ class GoldApiSource(BaseSource):
         response.raise_for_status()
         data = response.json()
 
-        # فیلد اصلی: price (قیمت هر اونس XAU به دلار)
         price = float(data["price"])
 
         return [

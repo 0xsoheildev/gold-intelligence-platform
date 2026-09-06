@@ -11,10 +11,6 @@ router = APIRouter(prefix="/prices", tags=["prices"])
 
 @router.get("/live", response_model=list[PriceOut])
 def get_live_prices(db: Session = Depends(get_db)):
-    """
-    آخرین قیمت ثبت‌شده برای هر (source, symbol).
-    فاز ۱: ساده و مستقیم؛ فاز ۶ این‌جا consensus_prices جایگزین میشه.
-    """
     subquery = (
         db.query(
             RawPrice.source,
@@ -31,7 +27,7 @@ def get_live_prices(db: Session = Depends(get_db)):
 
 @router.get("/history", response_model=list[PriceOut])
 def get_price_history(
-    symbol: str = Query(..., description="مثلا gold_18k یا xau_usd"),
+    symbol: str = Query(..., description="example gold_18k or xau_usd"),
     source: str | None = Query(None),
     limit: int = Query(200, le=2000),
     db: Session = Depends(get_db),

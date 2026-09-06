@@ -108,7 +108,7 @@ cp .env.example .env
 # add your GOLDAPI_KEY (free tier at goldapi.io) to .env
 
 docker compose up -d db       # start the database
-docker compose up backend     # start the API on http://localhost:8000
+docker compose up -d --build backend   # start the API on http://localhost:8000
 ```
 
 API docs: `http://localhost:8000/docs`
@@ -118,17 +118,19 @@ Run the ingestion scheduler (fetches Iranian + global prices every 10 minutes):
 ```bash
 python3 -m venv venv && source venv/bin/activate
 pip install -r backend/requirements.txt
-export DATABASE_URL=postgresql+psycopg2://gold_user:gold_pass@localhost:5432/gold_intelligence
+export DATABASE_URL=postgresql+psycopg://gold_user:gold_pass@localhost:5432/gold_intelligence
 export GOLDAPI_KEY=your_key_here
 python -m ingestion.scheduler
 ```
+
+> **macOS note**: if `pip install` fails building `psycopg` or `pydantic-core` from source, your local Python is likely too new (e.g. 3.14) for some packages' prebuilt wheels. Use Python 3.12 for the virtualenv instead: `brew install python@3.12 && python3.12 -m venv venv`.
 
 ---
 
 ## 🗺️ Roadmap
 
 - [x] **Phase 0** — Product design
-- [x] **Phase 1** — Data ingestion + raw storage
+- [x] **Phase 1** — Data ingestion + raw storage *(verified end-to-end)*
 - [ ] **Phase 2** — Premium / bubble engine
 - [ ] **Phase 3** — Technical indicators engine
 - [ ] **Phase 4** — Signal engine (v1)

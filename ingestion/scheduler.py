@@ -1,11 +1,10 @@
 """
-Phase 1 scheduler — هر ۱۰ دقیقه منابع رو fetch می‌کنه و در raw_prices ذخیره می‌کنه.
+Phase 1 Scheduler — Fetches the sources every 10 minutes and stores the data in `raw_prices`.**
 
-اجرا:
-    python -m ingestion.scheduler
+**Run:**
 
-در فازهای بعدی این فایل جای خودش رو به Celery (یا Kafka producer) می‌ده،
-ولی برای MVP همین کافیه.
+python -m ingestion.scheduler
+
 """
 
 import logging
@@ -35,14 +34,13 @@ def run_fetch_cycle():
             saved = save_price_points(points)
             logger.info("منبع %s: %d قیمت ذخیره شد", source.name, saved)
         except Exception:
-            # یه منبع خراب نباید بقیه رو متوقف کنه — این اصل رو از همین فاز ۱ رعایت می‌کنیم
             logger.exception("خطا در fetch از منبع %s", source.name)
 
 
 if __name__ == "__main__":
     scheduler = BlockingScheduler()
-    scheduler.add_job(run_fetch_cycle, "interval", minutes=FETCH_INTERVAL_MINUTES, next_run_time=None)
+    scheduler.add_job(run_fetch_cycle, "interval", minutes=FETCH_INTERVAL_MINUTES)
 
     logger.info("شروع scheduler — هر %d دقیقه اجرا می‌شه", FETCH_INTERVAL_MINUTES)
-    run_fetch_cycle()  # یه اجرای فوری اول کار
+    run_fetch_cycle()
     scheduler.start()
