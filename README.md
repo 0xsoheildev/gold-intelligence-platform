@@ -4,7 +4,7 @@
 
 **Iranian gold market intelligence — data ingestion, technical analysis, and LLM-explained trading signals**
 
-[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-TimescaleDB-336791?logo=postgresql&logoColor=white)](https://www.timescale.com/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
@@ -123,6 +123,13 @@ export GOLDAPI_KEY=your_key_here
 python -m ingestion.scheduler
 ```
 
+Compute the current gold premium (theoretical vs. actual price):
+
+```bash
+python -m features.premium.runner
+curl http://localhost:8000/premium/current
+```
+
 > **macOS note**: if `pip install` fails building `psycopg` or `pydantic-core` from source, your local Python is likely too new (e.g. 3.14) for some packages' prebuilt wheels. Use Python 3.12 for the virtualenv instead: `brew install python@3.12 && python3.12 -m venv venv`.
 
 ---
@@ -131,7 +138,7 @@ python -m ingestion.scheduler
 
 - [x] **Phase 0** — Product design
 - [x] **Phase 1** — Data ingestion + raw storage *(verified end-to-end)*
-- [ ] **Phase 2** — Premium / bubble engine
+- [x] **Phase 2** — Premium / bubble engine *(verified end-to-end)*
 - [ ] **Phase 3** — Technical indicators engine
 - [ ] **Phase 4** — Signal engine (v1)
 - [ ] **Phase 5** — News / event intelligence

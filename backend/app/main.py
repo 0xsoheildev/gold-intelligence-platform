@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api import prices
+from app.api import premium, prices
 
 app = FastAPI(
     title="Gold Intelligence Platform",
@@ -9,6 +9,7 @@ app = FastAPI(
 )
 
 app.include_router(prices.router)
+app.include_router(premium.router)
 
 
 @app.get("/health")

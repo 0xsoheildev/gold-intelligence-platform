@@ -27,7 +27,7 @@ def get_live_prices(db: Session = Depends(get_db)):
 
 @router.get("/history", response_model=list[PriceOut])
 def get_price_history(
-    symbol: str = Query(..., description="example gold_18k or xau_usd"),
+    symbol: str = Query(..., description="مثلا gold_18k یا xau_usd"),
     source: str | None = Query(None),
     limit: int = Query(200, le=2000),
     db: Session = Depends(get_db),
