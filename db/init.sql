@@ -44,6 +44,21 @@ CREATE TABLE IF NOT EXISTS gold_premium (
 
 SELECT create_hypertable('gold_premium', 'computed_at', if_not_exists => TRUE);
 
+CREATE TABLE IF NOT EXISTS technical_indicators (
+    id              BIGSERIAL,
+    symbol          TEXT        NOT NULL,
+    sma             NUMERIC,
+    ema             NUMERIC,
+    rsi             NUMERIC,
+    macd            NUMERIC,
+    macd_signal     NUMERIC,
+    macd_histogram  NUMERIC,
+    computed_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (id, computed_at)
+);
+
+SELECT create_hypertable('technical_indicators', 'computed_at', if_not_exists => TRUE);
+
 CREATE TABLE IF NOT EXISTS signals (
     id              BIGSERIAL,
     symbol          TEXT        NOT NULL,

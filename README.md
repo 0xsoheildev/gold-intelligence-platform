@@ -130,6 +130,15 @@ python -m features.premium.runner
 curl http://localhost:8000/premium/current
 ```
 
+Compute technical indicators (SMA, EMA, RSI, MACD) once you have enough price history (30-40+ points):
+
+```bash
+python -m features.technical.runner
+curl http://localhost:8000/technical/current
+```
+
+> Need to test before real data accumulates? Seed synthetic price history with `python -m scripts.seed_data --symbol gold_18k --points 60`, then clean it up afterward with `DELETE FROM raw_prices WHERE source = 'seed_synthetic';`.
+
 > **macOS note**: if `pip install` fails building `psycopg` or `pydantic-core` from source, your local Python is likely too new (e.g. 3.14) for some packages' prebuilt wheels. Use Python 3.12 for the virtualenv instead: `brew install python@3.12 && python3.12 -m venv venv`.
 
 ---
@@ -139,7 +148,7 @@ curl http://localhost:8000/premium/current
 - [x] **Phase 0** — Product design
 - [x] **Phase 1** — Data ingestion + raw storage *(verified end-to-end)*
 - [x] **Phase 2** — Premium / bubble engine *(verified end-to-end)*
-- [ ] **Phase 3** — Technical indicators engine
+- [x] **Phase 3** — Technical indicators engine *(verified end-to-end)*
 - [ ] **Phase 4** — Signal engine (v1)
 - [ ] **Phase 5** — News / event intelligence
 - [ ] **Phase 6** — Data quality layer (outlier detection, source reliability)
