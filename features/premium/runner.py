@@ -1,6 +1,10 @@
 import logging
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from sqlalchemy import create_engine, text
 
 from features.premium.calculator import premium_pct, theoretical_gold_18k_price

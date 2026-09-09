@@ -1,5 +1,21 @@
 """
-Iranian Source: TGJU.org
+منبع ایرانی: tgju.org
+
+هر نماد از **صفحه‌ی پروفایل مخصوص خودش** گرفته می‌شه (آدرس‌های ثابت و مستند):
+
+    گرم طلای ۱۸  -> https://www.tgju.org/profile/geram18
+    سکه امامی    -> https://www.tgju.org/profile/sekee
+    نیم‌سکه      -> https://www.tgju.org/profile/nim
+    ربع‌سکه      -> https://www.tgju.org/profile/rob
+    سکه گرمی    -> https://www.tgju.org/profile/gerami
+    دلار آزاد    -> https://www.tgju.org/profile/price_dollar_rl
+
+⚠️ نکته‌ی مهم: منطق استخراج قیمت زیر (`_extract_price`) یه fallback عمومیه
+(regex روی متن صفحه). برای دقت واقعی، با Inspect Element توی مرورگر خودت
+selector دقیق رو پیدا کن و جایگزین کن:
+    1. برو https://www.tgju.org/profile/geram18
+    2. راست‌کلیک روی عدد قیمت -> Inspect
+    3. tag/class واقعی رو توی BeautifulSoup استفاده کن
 """
 
 import re

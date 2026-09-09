@@ -7,8 +7,8 @@ unavailable and get renormalized out until Phase 5+ fills them in.
 TARGET_WEIGHTS = {
     "technical": 25,
     "premium": 20,
-    # "macro_fx": 20,      -- Phase 5+
-    # "news": 15,          -- Phase 5
+    "news": 15,
+    # "macro_fx": 20,      -- later phase
     # "regime": 10,        -- later phase
 }
 

@@ -1,5 +1,5 @@
 """
-Global Source: GoldAPI.io — Requires a free API key (sign up at GoldAPI.io).
+منبع جهانی: GoldAPI.io — نیاز به API key رایگان (ثبت‌نام در goldapi.io).
 """
 
 import httpx

@@ -59,6 +59,26 @@ CREATE TABLE IF NOT EXISTS technical_indicators (
 
 SELECT create_hypertable('technical_indicators', 'computed_at', if_not_exists => TRUE);
 
+-- Deduplicated by URL, so this stays a regular table rather than a hypertable
+-- (a unique constraint on a hypertable must include the partition column, which
+-- would complicate deduplication for no real benefit at this data volume).
+CREATE TABLE IF NOT EXISTS news_items (
+    id              BIGSERIAL   PRIMARY KEY,
+    source          TEXT        NOT NULL,
+    title           TEXT        NOT NULL,
+    url             TEXT        NOT NULL UNIQUE,
+    summary         TEXT,
+    published_at    TIMESTAMPTZ,
+    fetched_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    event           TEXT,
+    assets          JSONB,
+    direction       TEXT,
+    importance      NUMERIC,
+    classified_at   TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_news_items_classified_at ON news_items (classified_at DESC);
+
 CREATE TABLE IF NOT EXISTS signals (
     id              BIGSERIAL,
     symbol          TEXT        NOT NULL,

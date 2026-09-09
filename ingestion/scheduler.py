@@ -1,14 +1,16 @@
 """
-Phase 1 Scheduler — Fetches the sources every 10 minutes and stores the data in `raw_prices`.**
+Phase 1 scheduler — هر ۱۰ دقیقه منابع رو fetch می‌کنه و در raw_prices ذخیره می‌کنه.
 
-**Run:**
-
-python -m ingestion.scheduler
-
+اجرا:
+    python -m ingestion.scheduler
 """
 
 import logging
 import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 

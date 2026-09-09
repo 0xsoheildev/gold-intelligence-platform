@@ -92,7 +92,7 @@ Invalidation: USD/IRR drops below X, or gold breaks below Y
 | Scheduling | APScheduler → Celery/Kafka (later phases) |
 | Scraping | httpx, BeautifulSoup, Playwright |
 | ML (later phase) | scikit-learn, XGBoost |
-| LLM | Claude API — explanation only, never decision-making |
+| LLM | Gemini API (free tier) — explanation/classification only, never decision-making |
 | Web dashboard | Next.js |
 | Mobile app | Kotlin, Jetpack Compose |
 | Infra | Docker Compose |
@@ -142,9 +142,19 @@ curl http://localhost:8000/technical/current
 Get the current buy/hold/sell signal (combines technical + premium scores, degrades gracefully if a component isn't available yet):
 
 ```bash
+# add your GEMINI_API_KEY from aistudio.google.com to .env
 python -m features.signal.runner
 curl http://localhost:8000/signals/current
 ```
+
+Fetch and classify recent gold-relevant news (requires a free `GEMINI_API_KEY` from [aistudio.google.com](https://aistudio.google.com)):
+
+```bash
+python -m features.news.runner
+curl http://localhost:8000/news/recent
+```
+
+> Gemini's free tier caps at ~20 requests/day per model — unclassified items just stay queued and get picked up on the next run once quota resets.
 
 > **macOS note**: if `pip install` fails building `psycopg` or `pydantic-core` from source, your local Python is likely too new (e.g. 3.14) for some packages' prebuilt wheels. Use Python 3.12 for the virtualenv instead: `brew install python@3.12 && python3.12 -m venv venv`.
 
@@ -157,7 +167,7 @@ curl http://localhost:8000/signals/current
 - [x] **Phase 2** — Premium / bubble engine *(verified end-to-end)*
 - [x] **Phase 3** — Technical indicators engine *(verified end-to-end)*
 - [x] **Phase 4** — Signal engine (v1) *(verified end-to-end)*
-- [ ] **Phase 5** — News / event intelligence
+- [x] **Phase 5** — News / event intelligence *(verified end-to-end)*
 - [ ] **Phase 6** — Data quality layer (outlier detection, source reliability)
 - [ ] **Phase 7** — Premium Z-score + multi-horizon signals
 - [ ] **Phase 8** — Backtesting engine

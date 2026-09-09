@@ -18,6 +18,10 @@ import argparse
 import random
 from datetime import datetime, timedelta, timezone
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from ingestion.db import save_price_points
 from ingestion.sources.base import PricePoint
 
