@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api import news, premium, prices, signals, technical
+from app.api import news, premium, prices, quality, signals, technical
 
 app = FastAPI(
     title="Gold Intelligence Platform",
@@ -13,6 +13,7 @@ app.include_router(premium.router)
 app.include_router(technical.router)
 app.include_router(signals.router)
 app.include_router(news.router)
+app.include_router(quality.router)
 
 
 @app.get("/health")

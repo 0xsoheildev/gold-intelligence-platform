@@ -142,7 +142,6 @@ curl http://localhost:8000/technical/current
 Get the current buy/hold/sell signal (combines technical + premium scores, degrades gracefully if a component isn't available yet):
 
 ```bash
-# add your GEMINI_API_KEY from aistudio.google.com to .env
 python -m features.signal.runner
 curl http://localhost:8000/signals/current
 ```
@@ -156,6 +155,14 @@ curl http://localhost:8000/news/recent
 
 > Gemini's free tier caps at ~20 requests/day per model — unclassified items just stay queued and get picked up on the next run once quota resets.
 
+Run the data quality layer (cross-source outlier detection + reliability-weighted consensus price — meaningful once a symbol has 2+ sources):
+
+```bash
+python -m features.quality.runner
+curl http://localhost:8000/quality/consensus/current
+curl http://localhost:8000/quality/reliability
+```
+
 > **macOS note**: if `pip install` fails building `psycopg` or `pydantic-core` from source, your local Python is likely too new (e.g. 3.14) for some packages' prebuilt wheels. Use Python 3.12 for the virtualenv instead: `brew install python@3.12 && python3.12 -m venv venv`.
 
 ---
@@ -168,7 +175,7 @@ curl http://localhost:8000/news/recent
 - [x] **Phase 3** — Technical indicators engine *(verified end-to-end)*
 - [x] **Phase 4** — Signal engine (v1) *(verified end-to-end)*
 - [x] **Phase 5** — News / event intelligence *(verified end-to-end)*
-- [ ] **Phase 6** — Data quality layer (outlier detection, source reliability)
+- [x] **Phase 6** — Data quality layer (outlier detection, source reliability) *(verified end-to-end)*
 - [ ] **Phase 7** — Premium Z-score + multi-horizon signals
 - [ ] **Phase 8** — Backtesting engine
 - [ ] **Phase 9** — LLM explanation layer
